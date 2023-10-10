@@ -1,0 +1,23 @@
+GET http://localhost:3003/ping
+###
+
+GET http://localhost:3003/bands
+###
+
+POST http://localhost:3003/bands
+Content-Type: application/json
+
+{
+    "id": "b002",
+    "name": "KLB"
+}
+###
+
+PUT http://localhost:3003/bands/b003
+Content-Type: application/json
+
+{
+    "newId": "b001",
+    "newName": "Pitty"
+}
+###
