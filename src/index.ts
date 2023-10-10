@@ -137,3 +137,118 @@ app.put("/bands/:id", async (req: Request, res: Response) => {
     }
   }
 });
+
+// EXERCICIO DE FIXAÇAO
+app.get("/songs", async (req:Request, res:Response) => {
+  try {
+    const result = await db.raw(`SELECT * FROM songs`);
+    res.status(200).send(result)
+  } catch (error:any) {
+    if (req.statusCode === 200) {
+      res.status(500);
+    }
+
+    if (error instanceof Error) {
+      res.send(error.message);
+    } else {
+      res.send("Erro inesperado");
+    }
+  }
+});
+
+app.post("/songs", async (req: Request, res: Response) => {
+  try {
+    const { id, name, band_id } = req.body;
+
+    if (!id || !name || !band_id ) {
+      res.status(400);
+      throw new Error("id, name ou band_id inválidos");
+    }
+
+    await db.raw(`INSERT INTO songs
+        VALUES("${id}", "${name}", "${band_id}")
+        `);
+
+    res.status(200).send("Musica cadastrada");
+  } catch (error:any) {
+    if (req.statusCode === 200) {
+      res.status(500);
+    }
+
+    if (error instanceof Error) {
+      res.send(error.message);
+    } else {
+      res.send("Erro inesperado");
+    }
+  }
+});
+
+app.put("/songs/:id", async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const newId = req.body.newId;
+    const newName = req.body.newName;
+    const newBand_id = req.body.newBand_id;
+
+
+    if (newId !== undefined) {
+      if (typeof newId !== "string") {
+        res.status(400);
+        throw new Error("Id deve ser uma string");
+      }
+
+      if (newId.length !== 4) {
+        throw new Error("O id deve ter 4 caracteres");
+      }
+    }
+    if (newName !== undefined) {
+      if (typeof newName !== "string") {
+        res.status(400);
+        throw new Error("O name deve ser uma string");
+      }
+
+      if (newName.length < 2) {
+        throw new Error("O name deve ter no mínimo 2 caracteres");
+      }
+    }
+    if (newBand_id !== undefined) {
+      if (typeof newBand_id !== "string") {
+        res.status(400);
+        throw new Error("band_id deve ser uma string");
+      }
+
+      if (newBand_id.length !== 4) {
+        throw new Error("O band_id deve ter 4 caracteres");
+      }
+    }
+
+    const [song] = await db.raw(`SELECT * FROM songs WHERE id = "${id}"`);
+    console.log(song)
+
+    if(song){
+        await db.raw(`
+            UPDATE songs SET
+            id = "${newId || song.id}",
+            name = "${newName || song.name}",
+            band_id = "${newBand_id || song.band_id}"
+            WHERE id = "${id}"
+        `);
+    } else {
+        res.status(400)
+        throw new Error("Id Não encontrado");
+    }
+    res.status(200).send("Banda atualizada");
+
+  } catch (error: any) {
+    if (req.statusCode === 200) {
+      res.status(500);
+    }
+
+    if (error instanceof Error) {
+      res.send(error.message);
+    } else {
+      res.send("Erro inesperado");
+    }
+  }
+});

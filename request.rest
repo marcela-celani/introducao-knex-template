@@ -21,3 +21,26 @@ Content-Type: application/json
     "newName": "Pitty"
 }
 ###
+
+GET http://localhost:3003/songs
+###
+
+POST http://localhost:3003/songs
+Content-Type: application/json
+
+{
+    "id": "s002",
+    "name": "Admiravel Chip Novo",
+    "band_id": "b001"
+}
+###
+
+PUT http://localhost:3003/songs/s002
+Content-Type: application/json
+
+{
+    "newId": "s002",
+    "newName": "Teto de vidro",
+    "newBand_id": "b001"
+}
+###
